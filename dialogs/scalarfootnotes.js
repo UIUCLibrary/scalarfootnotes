@@ -4,9 +4,10 @@
  * https://github.com/UIUCLibrary/scalarfootnotes
  */
 
-(function (){
-    'use strict';
-    CKEDITOR.dialog.add( 'scalarfootnotesDialogue', function ( editor ) {
+(function($) {
+    "use strict";
+
+    CKEDITOR.dialog.add( 'scalarfootnotesDialog', function( editor ) {
 
         return {
             editor_name: false,
@@ -16,7 +17,9 @@
             title: 'Manage Footnotes',
             minWidth: 400,
             minHeight: 200,
-            // Contents of the dialog window
+            scalarfootnotes_el: false,
+
+            // Dialog window contents definition.
             //TODO: add tab to configure footnotes
             contents: [
                 {
@@ -37,6 +40,7 @@
                     ]
                 },
             ],
+
             //Fires when dialog opens, instantiates the dialogue components
             onShow: function () {
                 this.setupContent();
@@ -46,9 +50,12 @@
                     dialog.editor_name = evt.editor.name;
                     dialog.scalarfootnotes_editor = evt.editor;
                 } );
-                var current_editor_id = dialog.getParentEditor().id;
+                //keeping this becuase I like this position better
+                jQuery('.cke_dialog').css({'position': 'absolute', 'top': '2%'});
+
                 CKEDITOR.replaceAll( function( textarea, config ) {
                     // Make sure the textarea has the correct class:
+                    //TODO: make this graceful
                     if (!textarea.className.match(/footnote_text/)) {
                         return false;
                     }
@@ -76,8 +83,6 @@
                     }
                     return true;
                 });
-
-
             },
 
             //Fires when user hits Okay
@@ -87,20 +92,20 @@
                 var footnote_data   = footnote_editor.getData();
 
                 //TODO: need to make sure this is the correct type of check
-                if (footnote_data != ''){
-                    // Calls function from the core plugin to build the footnote
+                if (footnote_data != '') {
                     editor.plugins.scalarfootnotes.build(footnote_data, editor);
                 }
-                // Destroy the editor so it's rebuilt properly next time
+
+                // Destroy the editor so it's rebuilt properly next time:
                 footnote_editor.destroy();
+                return;
             },
 
-            //Fires if user hits Cancel
             onCancel: function() {
                 var dialog = this;
                 var footnote_editor = CKEDITOR.instances[dialog.editor_name];
                 footnote_editor.destroy();
             }
-        }
-    })
-}())
+        };
+    });
+}(window.jQuery));
