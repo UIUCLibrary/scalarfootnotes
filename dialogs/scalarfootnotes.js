@@ -95,6 +95,14 @@
                 footnote_editor.destroy();
             },
 
+            //Fires if user hits Cancel
+            onCancel: function() {
+                var dialog = this;
+                var footnote_editor = CKEDITOR.instances[dialog.editor_name];
+                footnote_editor.destroy();
+            }
+
+
 
         }
     })
