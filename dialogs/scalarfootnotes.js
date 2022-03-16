@@ -14,7 +14,7 @@
             scalarfootnotes_editor: false,
             dialog_dom_id: false,
             // Basic properties of the dialog window: title, minimum size.
-            title: 'Manage scalarfootnotes',
+            title: 'Add Footnotes',
             minWidth: 400,
             minHeight: 200,
             scalarfootnotes_el: false,
