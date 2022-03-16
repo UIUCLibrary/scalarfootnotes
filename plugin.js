@@ -5,57 +5,57 @@
  * https://github.com/UIUCLibrary/scalarfootnotes
  */
 
-(function () {
+(function ($) {
     'use strict';
 
     CKEDITOR.plugins.add('scalarfootnotes', {
         footnote_ids: [],
         requires: 'widget',
-        icons: 'footnotes',
+        icons: 'scalarfootnotes',
 
-        init: function ( editor ) {
+        init: function(editor) {
+
+            // Check for jQuery
+            // @TODO - remove if/when JQ dep. is removed.
+            if (typeof(window.jQuery) == 'undefined') {
+                console.warn('jQuery required but undetected so quitting scalarfootnotes.');
+                return false;
+            }
+
             // Allow `cite` to be editable:
             CKEDITOR.dtd.$editable['cite'] = 1;
 
             // Add some CSS tweaks:
-            var css = '.footnotes{background:#eee; padding:1px 15px;} .footnotes cite{font-style: normal;}';
+            var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
             CKEDITOR.addCss(css);
 
             var $this = this;
 
-            // Build the initial footnotes widget editables definition:
-            var prefix = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
-            var def = {};
-
-            if (!editor.config.footnotesDisableHeader) {
-                def.header = {
+            // Build the initial scalarfootnotes widget editables definition:
+            var prefix = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
+            var def = {
+                header: {
                     selector: 'header > *',
                     //allowedContent: ''
                     allowedContent: 'strong em span sub sup;'
-                };
-            }
-
-            // Get the number of existing footnotes. Note that the editor document isn't populated
-            // yet so we need to use vanilla JS:
-            var div = document.createElement('div');
-            div.innerHTML = editor.element.$.textContent.trim();
-
-            var l = div.querySelectorAll('.footnotes li').length,
-                i = 1;
-
+                }
+            };
+            var contents = $('<div>' + editor.element.$.textContent + '</div>')
+                , l = contents.find('.scalarfootnotes li').length
+                , i = 1;
             for (i; i <= l; i++) {
-                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[*]; cite[*](*); strong em span br'};
+                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; cite[*](*); strong em span br'};
             }
 
-            // Register the footnotes widget.
+            // Register the scalarfootnotes widget.
             editor.widgets.add('scalarfootnotes', {
 
                 // Minimum HTML which is required by this widget to work.
-                requiredContent: 'section(footnotes)',
+                requiredContent: 'div(scalarfootnotes)',
 
                 // Check the elements that need to be converted to widgets.
                 upcast: function(element) {
-                    return element.name == 'section' && element.hasClass('footnotes');
+                    return element.name == 'div' && element.hasClass('scalarfootnotes');
                 },
 
                 editables: def
@@ -69,33 +69,33 @@
 
                 // Check the elements that need to be converted to widgets.
                 upcast: function(element) {
-                    return element.name == 'sup' && typeof(element.attributes['data-footnote-id']) != 'undefined';
+                    return element.name == 'sup' && element.attributes['data-footnote-id'] != 'undefined';
                 },
             });
 
-            //create toolbar button and its texts
+            // Define an editor command that opens our dialog.
+            editor.addCommand('scalarfootnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
+                // @TODO: This needs work:
+                allowedContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
+                requiredContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]'
+            }));
+
+            // Create a toolbar button that executes the above command.
             editor.ui.addButton('Footnotes', {
 
                 // The text part of the button (if available) and tooptip.
                 label: 'Insert Footnotes',
 
                 // The command to execute on click.
-                command: 'footnotes',
+                command: 'scalarfootnotes',
 
                 // The button placement in the toolbar (toolbar group name).
-                //not sure if this is needed. In the scalar implementation this is set explicitly in config
                 toolbar: 'insert'
             });
 
             // Register our dialog file. this.path is the plugin folder path.
             CKEDITOR.dialog.add('scalarfootnotesDialog', this.path + 'dialogs/scalarfootnotes.js');
+        },
 
-            // open the dialogue
-            editor.addCommand('scalarfootnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
-                // @TODO: This needs work:
-                allowedContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
-                requiredContent: 'section(footnotes);header;li[id,data-footnote-id];a[href,id,rel];cite;sup[data-footnote-id]'
-            }));
-        }
-    })
-}())
+    });
+}(window.jQuery))
