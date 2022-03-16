@@ -96,6 +96,206 @@
                 allowedContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
                 requiredContent: 'section(footnotes);header;li[id,data-footnote-id];a[href,id,rel];cite;sup[data-footnote-id]'
             }));
+
+        },
+
+        build: function(footnote, editor) {
+            var footnote_id;
+
+
+            footnote_id = this.generateFootnoteId();
+
+
+            // Insert the marker:
+            var footnote_marker = '<sup data-footnote-id="' + footnote_id + '">X</sup>';
+
+            editor.insertHtml(footnote_marker);
+
+            //snapshots are used by the undo/redo
+            editor.fire('lockSnapshot');
+            this.addFootnote(this.buildFootnote(footnote_id, footnote, false, editor), editor);
+            editor.fire('unlockSnapshot');
+            this.reorderMarkers(editor);
+        },
+
+        buildFootnote: function(footnote_id, footnote_text, data, editor) {
+            var links   = '',
+                footnote,
+                letters = 'abcdefghijklmnopqrstuvwxyz',
+                order   = data ? data.order.indexOf(footnote_id) + 1 : 1,
+                prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
+
+            if (data && data.occurrences[footnote_id] == 1) {
+                links = '<a href="#footnote-marker' + prefix + '-' + order + '-1">^</a> ';
+            } else if (data && data.occurrences[footnote_id] > 1) {
+                var i = 0
+                    , l = data.occurrences[footnote_id]
+                    , n = l;
+                for (i; i < l; i++) {
+                    links += '<a href="#footnote-marker' + prefix + '-' + order + '-' + (i + 1) + '">' + letters.charAt(i) + '</a>';
+                    if (i < l-1) {
+                        links += ', ';
+                    } else {
+                        links += ' ';
+                    }
+                }
+            }
+            footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '"><sup>' + links + '</sup><cite>' + footnote_text + '</cite></li>';
+            return footnote;
+        },
+
+        addFootnote: function(footnote, editor) {
+            var contents = editor.editable();
+            var footnotes = contents.findOne('.footnotes');
+
+            if (footnotes === null) {
+                var container = '<section class="footnotes">';
+
+                // Add header
+                if (!editor.config.footnotesDisableHeader) {
+                    var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
+                    var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.footnotesHeaderEls
+                    if (editor.config.footnotesHeaderEls) {
+                        header_els = editor.config.footnotesHeaderEls;
+                    }
+                    container += '<header>' + header_els[0] + header_title + header_els[1] + '</header>';
+                }
+
+                // Add footnote
+                container += '<ol>' + footnote + '</ol>';
+
+                // End section
+                container += '</section>';
+
+                // Move cursor to end of content:
+                var range = editor.createRange();
+                range.moveToElementEditEnd(range.root);
+                editor.getSelection().selectRanges([range]);
+
+                // Insert the container:
+                editor.insertHtml(container);
+            } else {
+                footnotes.findOne('ol').appendHtml(footnote);
+            }
+        },
+
+        generateFootnoteId: function() {
+            var id = Math.random().toString(36).substr(2, 5);
+            while (String.prototype.indexOf(id, this.footnote_ids) != -1) {
+                id = String(this.generateFootnoteId());
+            }
+            this.footnote_ids.push(id);
+            return id;
+        },
+
+        reorderMarkers: function(editor) {
+            editor.fire('lockSnapshot');
+            var prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
+
+            var contents = editor.editable();
+            var data = {
+                order: [],
+                occurrences: {}
+            };
+
+            // Check that there's a footnotes section. If it's been deleted the markers are useless:
+            if (contents.find('.footnotes').toArray().length == 0) {
+                contents.find('sup[data-footnote-id]').toArray().forEach(function(item){
+                    item.remove();
+                });
+                editor.fire('unlockSnapshot');
+                return;
+            }
+
+            // If a header was previously added but is now disabled, remove it
+            var header_element = contents.findOne('.footnotes > header');
+            if (editor.config.footnotesDisableHeader && header_element) {
+                header_element.remove();
+            }
+
+            // Find all the markers in the document:
+            var markers = contents.find('sup[data-footnote-id]').toArray();
+
+            // If there aren't any, remove the Footnotes container:
+            if (markers.length == 0) {
+                contents.findOne('.footnotes').getParent().remove();
+                editor.fire('unlockSnapshot');
+                return;
+            }
+
+            // Otherwise reorder the markers:
+            markers.forEach(function(item){
+
+                var footnote_id = item.getAttribute('data-footnote-id')
+                    , marker_ref
+                    , n = data.order.indexOf(footnote_id);
+
+                // If this is the markers first occurrence:
+                if (n == -1) {
+                    // Store the id:
+                    data.order.push(footnote_id);
+                    n = data.order.length;
+                    data.occurrences[footnote_id] = 1;
+                    marker_ref = n + '-1';
+                } else {
+                    // Otherwise increment the number of occurrences:
+                    // (increment n due to zero-index array)
+                    n++;
+                    data.occurrences[footnote_id]++;
+                    marker_ref = n + '-' + data.occurrences[footnote_id];
+                }
+                // Replace the marker contents:
+                var marker = '<a href="#footnote' + prefix + '-' + n + '" id="footnote-marker' + prefix + '-' + marker_ref + '" rel="footnote">[' + n + ']</a>';
+
+                item.setHtml(marker);
+
+            });
+
+            // Prepare the footnotes_store object:
+            editor.footnotes_store = {};
+
+            // Then rebuild the Footnotes content to match marker order:
+            var footnotes     = ''
+                , footnote_text = ''
+                , footnote_id
+                , i = 0
+                , l = data.order.length;
+            for (i; i < l; i++) {
+                footnote_id   = data.order[i];
+                footnote_text = contents.findOne('.footnotes [data-footnote-id="' + footnote_id + '"] cite').getHtml();
+                // If the footnotes text can't be found in the editor, it may be in the tmp store
+                // following a cut:
+                if (!footnote_text) {
+                    footnote_text = editor.footnotes_tmp[footnote_id];
+                }
+                footnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
+                // Store the footnotes for later use (post cut/paste):
+                editor.footnotes_store[footnote_id] = footnote_text;
+            }
+
+            // Insert the footnotes into the list:
+            contents.findOne('.footnotes ol').setHtml(footnotes);
+
+            // Next we need to reinstate the 'editable' properties of the footnotes.
+            // (we have to do this individually due to Widgets 'fireOnce' for editable selectors)
+            var el = contents.findOne('.footnotes')
+                , n
+                , footnote_widget;
+            // So first we need to find the right Widget instance:
+            // (I hope there's a better way of doing this but I can't find one)
+            for (i in editor.widgets.instances) {
+                if (editor.widgets.instances[i].name == 'footnotes') {
+                    footnote_widget = editor.widgets.instances[i];
+                    break;
+                }
+            }
+            // Then we `initEditable` each footnote, giving it a unique selector:
+            for (i in data.order) {
+                n = parseInt(i) + 1;
+                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[*]; cite[*](*); em strong span'});
+            }
+
+            editor.fire('unlockSnapshot');
         }
     })
 }())
