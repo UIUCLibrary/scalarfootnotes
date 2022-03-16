@@ -14,13 +14,13 @@
             scalarfootnotes_editor: false,
             dialog_dom_id: false,
             // Basic properties of the dialog window: title, minimum size.
-            title: 'Manage Footnotes',
+            title: 'Manage scalarfootnotes',
             minWidth: 400,
             minHeight: 200,
             scalarfootnotes_el: false,
 
             // Dialog window contents definition.
-            //TODO: add tab to configure footnotes
+            //TODO: add tab to configure scalarfootnotes
             contents: [
                 {
                     // Definition of the Basic Settings dialog tab (page).
@@ -30,7 +30,7 @@
                     // The tab contents.
                     elements: [
                         {
-                            // Text input field for the footnotes text.
+                            // Text input field for the scalarfootnotes text.
                             type: 'textarea',
                             id: 'new_footnote',
                             'class': 'footnote_text',

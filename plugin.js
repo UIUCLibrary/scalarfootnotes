@@ -1,11 +1,11 @@
 /**
- * Insert footnotes elements into CKEditor editing area.
+ * Insert scalarfootnotes elements into CKEditor editing area.
  *
  * Version 0.1.0-mvp
  * https://github.com/UIUCLibrary/scalarfootnotes
  */
 
-(function ($) {
+(function($) {
     'use strict';
 
     CKEDITOR.plugins.add('scalarfootnotes', {
@@ -81,10 +81,10 @@
             }));
 
             // Create a toolbar button that executes the above command.
-            editor.ui.addButton('Footnotes', {
+            editor.ui.addButton('scalarfootnotes', {
 
                 // The text part of the button (if available) and tooptip.
-                label: 'Insert Footnotes',
+                label: 'Insert scalarfootnotes',
 
                 // The command to execute on click.
                 command: 'scalarfootnotes',
@@ -142,12 +142,12 @@
             var $scalarfootnotes = $contents.find('.scalarfootnotes');
 
             if ($scalarfootnotes.length == 0) {
-                var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'Footnotes';
+                var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'scalarfootnotes';
                 var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.scalarfootnotesHeaderEls
                 if (editor.config.scalarfootnotesHeaderEls) {
                     header_els = editor.config.scalarfootnotesHeaderEls;
                 }
-                var container = '<div class="scalarfootnotes"><hr aria-label="Footnotes below"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></div>';
+                var container = '<div class="scalarfootnotes"><hr aria-label="scalarfootnotes below"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></div>';
                 // Move cursor to end of content:
                 var range = editor.createRange();
                 range.moveToElementEditEnd(range.root);
@@ -186,7 +186,7 @@
 
             // Find all the markers in the document:
             var $markers = $contents.find('sup[data-footnote-id]');
-            // If there aren't any, remove the Footnotes container:
+            // If there aren't any, remove the scalarfootnotes container:
             if ($markers.length == 0) {
                 $contents.find('.scalarfootnotes').parent().remove();
                 editor.fire('unlockSnapshot');
@@ -221,7 +221,7 @@
             // Prepare the scalarfootnotes_store object:
             editor.scalarfootnotes_store = {};
 
-            // Then rebuild the Footnotes content to match marker order:
+            // Then rebuild the scalarfootnotes content to match marker order:
             var scalarfootnotes     = ''
                 , footnote_text = ''
                 , footnote_id
@@ -230,20 +230,20 @@
             for (i; i < l; i++) {
                 footnote_id   = data.order[i];
                 footnote_text = $contents.find('.scalarfootnotes [data-footnote-id=' + footnote_id + '] cite').html();
-                // If the footnotes text can't be found in the editor, it may be in the tmp store
+                // If the scalarfootnotes text can't be found in the editor, it may be in the tmp store
                 // following a cut:
                 if (!footnote_text) {
                     footnote_text = editor.scalarfootnotes_tmp[footnote_id];
                 }
                 scalarfootnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
-                // Store the footnotes for later use (post cut/paste):
+                // Store the scalarfootnotes for later use (post cut/paste):
                 editor.scalarfootnotes_store[footnote_id] = footnote_text;
             }
 
-            // Insert the footnotes into the list:
+            // Insert the scalarfootnotes into the list:
             $contents.find('.scalarfootnotes ol').html(scalarfootnotes);
 
-            // Next we need to reinstate the 'editable' properties of the footnotes.
+            // Next we need to reinstate the 'editable' properties of the scalarfootnotes.
             // (we have to do this individually due to Widgets 'fireOnce' for editable selectors)
             var el = $contents.find('.scalarfootnotes')
                 , n
@@ -266,4 +266,4 @@
         }
 
     });
-}(window.jQuery))
+}(window.jQuery));
