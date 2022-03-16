@@ -10,7 +10,7 @@
 
         return {
             editor_name: false,
-            footnotes_editor: false,
+            scalarfootnotes_editor: false,
             dialog_dom_id: false,
             // Basic properties of the dialog window: title, minimum size.
             title: 'Manage Footnotes',
@@ -44,7 +44,7 @@
 
                 CKEDITOR.on( 'instanceLoaded', function( evt ) {
                     dialog.editor_name = evt.editor.name;
-                    dialog.footnotes_editor = evt.editor;
+                    dialog.scalarfootnotes_editor = evt.editor;
                 } );
                 var current_editor_id = dialog.getParentEditor().id;
                 CKEDITOR.replaceAll( function( textarea, config ) {
@@ -66,9 +66,9 @@
                     config.height = 80;
                     config.resize_enabled = false;
                     config.autoGrow_minHeight = 80;
-                    config.removePlugins = 'footnotes, scalar';
+                    config.removePlugins = 'scalarfootnotes, scalar';
 
-                    var extra_config = editor.config.footnotesDialogEditorExtraConfig;
+                    var extra_config = editor.config.scalarfootnotesDialogEditorExtraConfig;
                     if (extra_config) {
                         for (var attribute in extra_config) {
                             config[attribute] = extra_config[attribute];

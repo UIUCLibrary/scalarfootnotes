@@ -116,7 +116,7 @@
                 footnote,
                 letters = 'abcdefghijklmnopqrstuvwxyz',
                 order   = data ? data.order.indexOf(footnote_id) + 1 : 1,
-                prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
+                prefix  = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
 
             if (data && data.occurrences[footnote_id] == 1) {
                 links = '<a href="#footnote-marker' + prefix + '-' + order + '-1">↵</a> ';
@@ -139,15 +139,15 @@
 
         addFootnote: function(footnote, editor) {
             var $contents  = $(editor.editable().$);
-            var $footnotes = $contents.find('.footnotes');
+            var $scalarfootnotes = $contents.find('.scalarfootnotes');
 
-            if ($footnotes.length == 0) {
-                var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
-                var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.footnotesHeaderEls
-                if (editor.config.footnotesHeaderEls) {
-                    header_els = editor.config.footnotesHeaderEls;
+            if ($scalarfootnotes.length == 0) {
+                var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'Footnotes';
+                var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.scalarfootnotesHeaderEls
+                if (editor.config.scalarfootnotesHeaderEls) {
+                    header_els = editor.config.scalarfootnotesHeaderEls;
                 }
-                var container = '<div class="footnotes"><hr aria-label="Footnotes below"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></div>';
+                var container = '<div class="scalarfootnotes"><hr aria-label="Footnotes below"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></div>';
                 // Move cursor to end of content:
                 var range = editor.createRange();
                 range.moveToElementEditEnd(range.root);
@@ -155,7 +155,7 @@
                 // Insert the container:
                 editor.insertHtml(container);
             } else {
-                $footnotes.find('ol').append(footnote);
+                $scalarfootnotes.find('ol').append(footnote);
             }
         },
 
@@ -170,15 +170,15 @@
 
         reorderMarkers: function(editor) {
             editor.fire('lockSnapshot');
-            var prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
+            var prefix  = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
             var $contents = $(editor.editable().$);
             var data = {
                 order: [],
                 occurrences: {}
             };
 
-            // Check that there's a footnotes div. If it's been deleted the markers are useless:
-            if ($contents.find('.footnotes').length == 0) {
+            // Check that there's a scalarfootnotes div. If it's been deleted the markers are useless:
+            if ($contents.find('.scalarfootnotes').length == 0) {
                 $contents.find('sup[data-footnote-id]').remove();
                 editor.fire('unlockSnapshot');
                 return;
@@ -188,7 +188,7 @@
             var $markers = $contents.find('sup[data-footnote-id]');
             // If there aren't any, remove the Footnotes container:
             if ($markers.length == 0) {
-                $contents.find('.footnotes').parent().remove();
+                $contents.find('.scalarfootnotes').parent().remove();
                 editor.fire('unlockSnapshot');
                 return;
             }
@@ -218,40 +218,40 @@
                 $(this).html(marker);
             });
 
-            // Prepare the footnotes_store object:
-            editor.footnotes_store = {};
+            // Prepare the scalarfootnotes_store object:
+            editor.scalarfootnotes_store = {};
 
             // Then rebuild the Footnotes content to match marker order:
-            var footnotes     = ''
+            var scalarfootnotes     = ''
                 , footnote_text = ''
                 , footnote_id
                 , i = 0
                 , l = data.order.length;
             for (i; i < l; i++) {
                 footnote_id   = data.order[i];
-                footnote_text = $contents.find('.footnotes [data-footnote-id=' + footnote_id + '] cite').html();
+                footnote_text = $contents.find('.scalarfootnotes [data-footnote-id=' + footnote_id + '] cite').html();
                 // If the footnotes text can't be found in the editor, it may be in the tmp store
                 // following a cut:
                 if (!footnote_text) {
-                    footnote_text = editor.footnotes_tmp[footnote_id];
+                    footnote_text = editor.scalarfootnotes_tmp[footnote_id];
                 }
-                footnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
+                scalarfootnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
                 // Store the footnotes for later use (post cut/paste):
-                editor.footnotes_store[footnote_id] = footnote_text;
+                editor.scalarfootnotes_store[footnote_id] = footnote_text;
             }
 
             // Insert the footnotes into the list:
-            $contents.find('.footnotes ol').html(footnotes);
+            $contents.find('.scalarfootnotes ol').html(scalarfootnotes);
 
             // Next we need to reinstate the 'editable' properties of the footnotes.
             // (we have to do this individually due to Widgets 'fireOnce' for editable selectors)
-            var el = $contents.find('.footnotes')
+            var el = $contents.find('.scalarfootnotes')
                 , n
                 , footnote_widget;
             // So first we need to find the right Widget instance:
             // (I hope there's a better way of doing this but I can't find one)
             for (i in editor.widgets.instances) {
-                if (editor.widgets.instances[i].name == 'footnotes') {
+                if (editor.widgets.instances[i].name == 'scalarfootnotes') {
                     footnote_widget = editor.widgets.instances[i];
                     break;
                 }
@@ -264,7 +264,6 @@
 
             editor.fire('unlockSnapshot');
         }
-
 
     });
 }(window.jQuery))
