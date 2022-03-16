@@ -101,6 +101,6 @@
                 var footnote_editor = CKEDITOR.instances[dialog.editor_name];
                 footnote_editor.destroy();
             }
-        }
-    })
-}())
+        };
+    });
+}(window.jQuery));
