@@ -4,9 +4,10 @@
  * https://github.com/UIUCLibrary/footnotes
  */
 
-(function ($){
+(function($) {
     "use strict";
-    CKEDITOR.dialog.add( 'footnotesDialogue', function ( editor ) {
+
+    CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
         return {
             editor_name: false,
@@ -16,7 +17,9 @@
             title: 'Manage Footnotes',
             minWidth: 400,
             minHeight: 200,
-            // Contents of the dialog window
+            footnotes_el: false,
+
+            // Dialog window contents definition.
             //TODO: add tab to configure footnotes
             contents: [
                 {
@@ -37,6 +40,7 @@
                     ]
                 },
             ],
+
             //Fires when dialog opens, instantiates the dialogue components
             onShow: function () {
                 this.setupContent();
@@ -49,9 +53,9 @@
                 //keeping this becuase I like this position better
                 jQuery('.cke_dialog').css({'position': 'absolute', 'top': '2%'});
 
-                var current_editor_id = dialog.getParentEditor().id;
                 CKEDITOR.replaceAll( function( textarea, config ) {
                     // Make sure the textarea has the correct class:
+                    //TODO: make this graceful
                     if (!textarea.className.match(/footnote_text/)) {
                         return false;
                     }
@@ -88,21 +92,20 @@
                 var footnote_data   = footnote_editor.getData();
 
                 //TODO: need to make sure this is the correct type of check
-                if (footnote_data != ''){
-                    // Calls function from the core plugin to build the footnote
-                    editor.plugins.footnotes.build(footnote_data, editor);
+                if (footnote_data != '') {
+                    editor.plugins.footnotes.build(footnote_data, true, editor);
                 }
-                // Destroy the editor so it's rebuilt properly next time
+
+                // Destroy the editor so it's rebuilt properly next time:
                 footnote_editor.destroy();
                 return;
             },
 
-            //Fires if user hits Cancel
             onCancel: function() {
                 var dialog = this;
                 var footnote_editor = CKEDITOR.instances[dialog.editor_name];
                 footnote_editor.destroy();
             }
-        }
-    })
-}(window.jQuery))
+        };
+    });
+}(window.jQuery));
