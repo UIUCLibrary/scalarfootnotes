@@ -31,6 +31,34 @@
 
             var $this = this;
 
+            // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store):
+            editor.on('instanceReady', function(evt) {
+                $this.reorderMarkers(editor);
+            });
+
+            // Add the reorder change event:
+            editor.on('change', function(evt) {
+                // Copy the scalarfootnotes_store as we may be doing a cut:
+                if(!evt.editor.scalarfootnotes_tmp) {
+                    evt.editor.scalarfootnotes_tmp = evt.editor.scalarfootnotes_store;
+                }
+
+                // Prevent no selection errors:
+                if (!evt.editor.getSelection().getStartElement()) {
+                    return;
+                }
+                // Don't reorder the markers if editing a cite:
+                var footnote_div = evt.editor.getSelection().getStartElement().getAscendant('div');
+                if (footnote_div && footnote_div.$.className.indexOf('scalarfootnotes') != -1) {
+                    return;
+                }
+                // SetTimeout seems to be necessary (it's used in the core but can't be 100% sure why)
+                setTimeout(function(){
+                        $this.reorderMarkers(editor);
+                    },
+                    0
+                );
+            });
             // Build the initial scalarfootnotes widget editables definition:
             var prefix = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
             var def = {
