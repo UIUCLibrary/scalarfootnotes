@@ -2,13 +2,13 @@
  * Insert footnotes elements into CKEditor editing area.
  *
  * Version 0.1.0-mvp
- * https://github.com/UIUCLibrary/scalarfootnotes
+ * https://github.com/UIUCLibrary/footnotes
  */
 
 (function () {
     'use strict';
 
-    CKEDITOR.plugins.add('scalarfootnotes', {
+    CKEDITOR.plugins.add('footnotes', {
         footnote_ids: [],
         requires: 'widget',
         icons: 'footnotes',
@@ -48,7 +48,7 @@
             }
 
             // Register the footnotes widget.
-            editor.widgets.add('scalarfootnotes', {
+            editor.widgets.add('footnotes', {
 
                 // Minimum HTML which is required by this widget to work.
                 requiredContent: 'section(footnotes)',
@@ -88,10 +88,10 @@
             });
 
             // Register our dialog file. this.path is the plugin folder path.
-            CKEDITOR.dialog.add('scalarfootnotesDialog', this.path + 'dialogs/scalarfootnotes.js');
+            CKEDITOR.dialog.add('footnotesDialog', this.path + 'dialogs/footnotes.js');
 
             // open the dialogue
-            editor.addCommand('scalarfootnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
+            editor.addCommand('footnotes', new CKEDITOR.dialogCommand('footnotesDialog', {
                 // @TODO: This needs work:
                 allowedContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
                 requiredContent: 'section(footnotes);header;li[id,data-footnote-id];a[href,id,rel];cite;sup[data-footnote-id]'

@@ -1,12 +1,12 @@
 /**
- * The scalarfootnotes dialogue definition
+ * The footnotes dialogue definition
  * Version 0.1.0-mvp
- * https://github.com/UIUCLibrary/scalarfootnotes
+ * https://github.com/UIUCLibrary/footnotes
  */
 
 (function (){
     'use strict';
-    CKEDITOR.dialog.add( 'scalarfootnotesDialogue', function ( editor ) {
+    CKEDITOR.dialog.add( 'footnotesDialogue', function ( editor ) {
 
         return {
             editor_name: false,
@@ -89,7 +89,7 @@
                 //TODO: need to make sure this is the correct type of check
                 if (footnote_data != ''){
                     // Calls function from the core plugin to build the footnote
-                    editor.plugins.scalarfootnotes.build(footnote_data, editor);
+                    editor.plugins.footnotes.build(footnote_data, editor);
                 }
                 // Destroy the editor so it's rebuilt properly next time
                 footnote_editor.destroy();
