@@ -48,7 +48,7 @@
             }
 
             // Register the footnotes widget.
-            editor.widgets.add('footnotes', {
+            editor.widgets.add('scalarfootnotes', {
 
                 // Minimum HTML which is required by this widget to work.
                 requiredContent: 'section(footnotes)',
@@ -91,7 +91,7 @@
             CKEDITOR.dialog.add('scalarfootnotesDialog', this.path + 'dialogs/scalarfootnotes.js');
 
             // open the dialogue
-            editor.addCommand('footnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
+            editor.addCommand('scalarfootnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
                 // @TODO: This needs work:
                 allowedContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
                 requiredContent: 'section(footnotes);header;li[id,data-footnote-id];a[href,id,rel];cite;sup[data-footnote-id]'
