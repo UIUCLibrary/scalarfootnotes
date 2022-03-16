@@ -46,6 +46,9 @@
                     dialog.editor_name = evt.editor.name;
                     dialog.footnotes_editor = evt.editor;
                 } );
+                //keeping this becuase I like this position better
+                jQuery('.cke_dialog').css({'position': 'absolute', 'top': '2%'});
+
                 var current_editor_id = dialog.getParentEditor().id;
                 CKEDITOR.replaceAll( function( textarea, config ) {
                     // Make sure the textarea has the correct class:
@@ -91,6 +94,7 @@
                 }
                 // Destroy the editor so it's rebuilt properly next time
                 footnote_editor.destroy();
+                return;
             },
 
             //Fires if user hits Cancel
