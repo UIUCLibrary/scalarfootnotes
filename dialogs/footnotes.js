@@ -4,7 +4,7 @@
  * https://github.com/UIUCLibrary/footnotes
  */
 
-(function (){
+(function ($){
     'use strict';
     CKEDITOR.dialog.add( 'footnotesDialogue', function ( editor ) {
 
@@ -76,8 +76,6 @@
                     }
                     return true;
                 });
-
-
             },
 
             //Fires when user hits Okay
