@@ -5,7 +5,7 @@
  */
 
 (function ($){
-    'use strict';
+    "use strict";
     CKEDITOR.dialog.add( 'footnotesDialogue', function ( editor ) {
 
         return {
@@ -101,4 +101,4 @@
             }
         }
     })
-}())
+}(window.jQuery))
