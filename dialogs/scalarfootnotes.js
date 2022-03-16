@@ -81,6 +81,20 @@
             },
 
             //Fires when user hits Okay
+            onOk: function() {
+                var dialog = this;
+                var footnote_editor = CKEDITOR.instances[dialog.editor_name];
+                var footnote_data   = footnote_editor.getData();
+
+                //TODO: need to make sure this is the correct type of check
+                if (footnote_data != ''){
+                    // Calls function from the core plugin to build the footnote
+                    editor.plugins.scalarfootnotes.build(footnote_data, editor);
+                }
+                // Destroy the editor so it's rebuilt properly next time
+                footnote_editor.destroy();
+            },
+
 
         }
     })
