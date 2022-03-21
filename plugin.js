@@ -27,6 +27,43 @@
 
             // Add some CSS tweaks:
             var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
+
+            //account for scalar header when scrolling back to text
+            css += 'a[rel=footnote] {scroll-margin-top: 10em;}'
+
+            //animate with highlight when jumping to/from footnote/text
+            css += '[data-footnote-id]:target, [rel="footnote"]:target {\n' +
+                '        animation: hilite-background 5s;\n' +
+                '        moz-animation: hilite-background 5s;\n' +
+                '        ms-animation: hilite-background 5s;\n' +
+                '        o-animation: hilite-background 5s;\n' +
+                '        webkit-animation: hilite-background 5s;\n' +
+                '    }\n' +
+                '    @-webkit-keyframes hilite-background {\n' +
+                '        0%   { background-color: transparent; }\n' +
+                '        30%  { background-color: #fbff0f; }\n' +
+                '        100% { background-color: transparent; }\n' +
+                '    }\n' +
+                '    @-moz-keyframes hilite-background {\n' +
+                '        0%   { background-color: transparent; }\n' +
+                '        30%  { background-color: #fbff0f; }\n' +
+                '        100% { background-color: transparent; }\n' +
+                '    }\n' +
+                '    @-ms-keyframes hilite-background {\n' +
+                '        0%   { background-color: transparent; }\n' +
+                '        30%  { background-color: #fbff0f; }\n' +
+                '        100% { background-color: transparent; }\n' +
+                '    }\n' +
+                '    @-o-keyframes hilite-background {\n' +
+                '        0%   { background-color: transparent; }\n' +
+                '        30%  { background-color: #fbff0f; }\n' +
+                '        100% { background-color: transparent; }\n' +
+                '    }\n' +
+                '    @keyframes hilite-background {\n' +
+                '        0%   { background-color: transparent; }\n' +
+                '        30%  { background-color: #fbff0f; }\n' +
+                '        100% { background-color: transparent; }\n' +
+                '    }'
             CKEDITOR.addCss(css);
 
             var $this = this;
