@@ -112,7 +112,7 @@
             editor.ui.addButton('scalarfootnotes', {
 
                 // The text part of the button (if available) and tooptip.
-                label: 'Insert scalarfootnotes',
+                label: 'Insert Footnote',
 
                 // The command to execute on click.
                 command: 'scalarfootnotes',
@@ -170,7 +170,7 @@
             var $scalarfootnotes = $contents.find('.scalarfootnotes');
 
             if ($scalarfootnotes.length == 0) {
-                var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'scalarfootnotes';
+                var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'Footnotes';
                 var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.scalarfootnotesHeaderEls
                 if (editor.config.scalarfootnotesHeaderEls) {
                     header_els = editor.config.scalarfootnotesHeaderEls;
