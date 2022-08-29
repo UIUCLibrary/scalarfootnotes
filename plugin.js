@@ -15,21 +15,12 @@
 
         init: function(editor) {
 
-            // Check for jQuery
-            // @TODO - remove if/when JQ dep. is removed.
-            if (typeof(window.jQuery) == 'undefined') {
-                console.warn('jQuery required but undetected so quitting scalarfootnotes.');
-                return false;
-            }
-
             // Allow `cite` to be editable:
             CKEDITOR.dtd.$editable['cite'] = 1;
 
             // Add some CSS tweaks:
             var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
             CKEDITOR.addCss(css);
-
-            var $this = this;
 
             // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store):
             editor.on('instanceReady', function(evt) {
