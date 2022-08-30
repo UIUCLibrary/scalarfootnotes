@@ -15,6 +15,9 @@
 
         init: function(editor) {
 
+            if (editor.plugins.detectConflict('scalarfootnotes', ['editorialTools'])) {
+                return;
+            }
             // Allow `cite` to be editable:
             CKEDITOR.dtd.$editable['cite'] = 1;
 
@@ -22,6 +25,7 @@
             var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
             CKEDITOR.addCss(css);
 
+            let $this = this;
             // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store):
             editor.on('instanceReady', function(evt) {
                 $this.reorderMarkers(editor);
