@@ -21,6 +21,22 @@
 
             //only initialize for authors to prevent plugin from making changes during editorial review stages
             if (editor.plugins.detectConflict('scalarfootnotes', ['editorialTools']) && !$is_author) {
+                editor.ui.addButton('scalarfootnotes', {
+
+                    //tooltip
+                    label: 'Footnotes plugin disabled during editorial workflow.',
+
+                    // an empty command used to disable to buttton
+                    command: 'disabledmessage',
+
+                });
+
+                //do nothing but show the button as disabled
+                editor.addCommand(
+                    'disabledmessage',
+                    { startDisabled: true}
+                    );
+
                 return;
             }
             // Allow `cite` to be editable:
