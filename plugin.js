@@ -15,6 +15,11 @@
 
         init: function(editor) {
 
+
+            // to keep up to date with methods for detecting author, see https://github.com/anvc/scalar/blob/7babfa113dfbc7b324bf72fd47b21f748e49886c/system/application/views/widgets/ckeditor/plugins/editorialTools/plugin.js#L10
+            base = this;
+            base.is_author = $('link#user_level').length > 0 && $('link#user_level').attr('href')=='scalar:Author';
+
             if (editor.plugins.detectConflict('scalarfootnotes', ['editorialTools'])) {
                 return;
             }
