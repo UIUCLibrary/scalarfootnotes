@@ -77,7 +77,7 @@
             var prefix = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
             var def = {
                 header: {
-                    selector: 'header > *',
+                    selector: 'div#scalarfootnotes > *',
                     //allowedContent: ''
                     allowedContent: 'strong em span sub sup;'
                 }
@@ -161,8 +161,12 @@
         },
 
         addFootnote: function(footnote, editor) {
+            //find the section with the footnotes
             var $scalarfootnotes = CKEDITOR.document.getById( 'scalarfootnotes' );
+
+            //if the footnotes section doesn't exist, create it
             if (!$scalarfootnotes) {
+                //get the configurable components from the config
                 var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'Footnotes';
                 var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.scalarfootnotesHeaderEls
                 if (editor.config.scalarfootnotesHeaderEls) {
