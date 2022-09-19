@@ -5,8 +5,7 @@
  * https://github.com/UIUCLibrary/scalarfootnotes
  */
 
-(function($) {
-    'use strict';
+
 
     CKEDITOR.plugins.add('scalarfootnotes', {
         footnote_ids: [],
@@ -16,8 +15,7 @@
         init: function(editor) {
 
             // to keep up to date with methods for detecting author, see https://github.com/anvc/scalar/blob/7babfa113dfbc7b324bf72fd47b21f748e49886c/system/application/views/widgets/ckeditor/plugins/editorialTools/plugin.js#L10
-            let $is_author;
-            $is_author = $('link#user_level').length > 0 && $('link#user_level').attr('href')=='scalar:Author';
+            let $is_author = $('link#user_level').length > 0 && $('link#user_level').attr('href')=='scalar:Author';
 
             //only initialize for authors to prevent plugin from making changes during editorial review stages
             if (editor.plugins.detectConflict('scalarfootnotes', ['editorialTools']) && !$is_author) {
@@ -26,7 +24,7 @@
                     //tooltip
                     label: 'Footnotes plugin disabled during editorial workflow.',
 
-                    // an empty command used to disable to buttton
+                    // an empty command used to disable to button
                     command: 'disabledmessage',
 
                 });
@@ -43,8 +41,8 @@
             CKEDITOR.dtd.$editable['cite'] = 1;
 
             // Add some CSS tweaks:
-            var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
-            CKEDITOR.addCss(css);
+            // var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
+            // CKEDITOR.addCss(css);
 
             let $this = this;
             // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store):
@@ -140,6 +138,7 @@
             // Register our dialog file. this.path is the plugin folder path.
             CKEDITOR.dialog.add('scalarfootnotesDialog', this.path + 'dialogs/scalarfootnotes.js');
         },
+
         build: function(footnote, editor) {
             var footnote_id = this.generateFootnoteId();
 
@@ -156,42 +155,20 @@
         },
 
         buildFootnote: function(footnote_id, footnote_text, data, editor) {
-            var links   = '',
-                footnote,
-                letters = 'abcdefghijklmnopqrstuvwxyz',
-                order   = data ? data.order.indexOf(footnote_id) + 1 : 1,
-                prefix  = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
-
-            if (data && data.occurrences[footnote_id] == 1) {
-                links = '<a href="#footnote-marker' + prefix + '-' + order + '-1">↵</a> ';
-            } else if (data && data.occurrences[footnote_id] > 1) {
-                var i = 0
-                    , l = data.occurrences[footnote_id]
-                    , n = l;
-                for (i; i < l; i++) {
-                    links += '<a href="#footnote-marker' + prefix + '-' + order + '-' + (i + 1) + '">' + letters.charAt(i) + '</a>';
-                    if (i < l-1) {
-                        links += ', ';
-                    } else {
-                        links += ' ';
-                    }
-                }
-            }
-            footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '"><cite>' + footnote_text + '</cite>' + links + '</li>';
-            return footnote;
+            let prefix = editor.config.scalarfootnotesPrefix ? '-' + editor.config.scalarfootnotesPrefix : '';
+            let links = '<a href="#footnote-marker' + prefix + '-' + '">↵</a> ';
+            return '<li id="footnote' + prefix + '-' + '" data-footnote-id="' + footnote_id + '"><cite>' + footnote_text + '</cite>' + links + '</li>';
         },
 
         addFootnote: function(footnote, editor) {
-            var $contents  = $(editor.editable().$);
-            var $scalarfootnotes = $contents.find('.scalarfootnotes');
-
-            if ($scalarfootnotes.length == 0) {
+            var $scalarfootnotes = CKEDITOR.document.getById( 'scalarfootnotes' );
+            if (!$scalarfootnotes) {
                 var header_title = editor.config.scalarfootnotesTitle ? editor.config.scalarfootnotesTitle : 'Footnotes';
                 var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.scalarfootnotesHeaderEls
                 if (editor.config.scalarfootnotesHeaderEls) {
                     header_els = editor.config.scalarfootnotesHeaderEls;
                 }
-                var container = '<div class="scalarfootnotes"><hr aria-label="scalarfootnotes below"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></div>';
+                var container = '<div class="scalarfootnotes" id="scalarfootnotes">' + header_els[0] + header_title + header_els[1] + '<ol>' + footnote + '</ol></div>';
                 // Move cursor to end of content:
                 var range = editor.createRange();
                 range.moveToElementEditEnd(range.root);
@@ -223,6 +200,7 @@
 
             // Check that there's a scalarfootnotes div. If it's been deleted the markers are useless:
             if ($contents.find('.scalarfootnotes').length == 0) {
+                console.log('.scalarfootnotes = 0')
                 $contents.find('sup[data-footnote-id]').remove();
                 editor.fire('unlockSnapshot');
                 return;
@@ -310,4 +288,3 @@
         }
 
     });
-}(window.jQuery));
