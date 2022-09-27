@@ -1,33 +1,38 @@
+(function($) {
+    'use strict';
+
 CKEDITOR.plugins.add( 'scalarfootnotes', {
+    footnote_max_id: 0,
+
     requires: 'widget',
 
     icons: 'scalarfootnotes',
 
     init: function( editor ) {
-        editor.widgets.add( 'scalarfootnotes', {
-
-            editables: {
-                title: {
-                    selector: '.simplebox-title',
-                    allowedContent: 'br strong em'
-                },
-                content: {
-                    selector: '.simplebox-content',
-                    allowedContent: 'p br ul ol li strong em'
-                }
-            },
-
-            allowedContent:
-                'div(!simplebox); div(!simplebox-content); h2(!simplebox-title)',
-
-            requiredContent: 'div(simplebox)',
-
-
-            upcast: function( element ) {
-                return element.name == 'div' && element.hasClass( 'simplebox' );
-            },
-
-        } );
+        // editor.widgets.add( 'scalarfootnotes', {
+        //
+        //     editables: {
+        //         title: {
+        //             selector: '.simplebox-title',
+        //             allowedContent: 'br strong em'
+        //         },
+        //         content: {
+        //             selector: '.simplebox-content',
+        //             allowedContent: 'p br ul ol li strong em'
+        //         }
+        //     },
+        //
+        //     allowedContent:
+        //         'div(!simplebox); div(!simplebox-content); h2(!simplebox-title)',
+        //
+        //     requiredContent: 'div(simplebox)',
+        //
+        //
+        //     upcast: function( element ) {
+        //         return element.name == 'div' && element.hasClass( 'simplebox' );
+        //     },
+        //
+        // } );
         editor.ui.addButton('scalarfootnotes', {
 
             // The text part of the button (if available) and tooptip.
@@ -48,9 +53,13 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
     },
     build: function (editor){
         console.log('execute the build function')
+        console.log(this.generateId(editor))
+
     },
 
     generateId: function (editor){
+        this.footnote_max_id += 1;
+        return "sfn-" + this.footnote_max_id.toString();
 
     },
 
@@ -58,3 +67,4 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     }
 } );
+}(window.jQuery));
