@@ -143,6 +143,18 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         });
 
 
-    }
+    },
 
+    reorderFootnotes: function (editor, footnotes){
+
+
+        // footnotes will be an ordered list of footnotes
+
+        //spitballing ideas to use the footnotes array as a single source of truth
+        //perhaps it would be better to get a query selector of the vdom wih the footnote markers, because
+        //that is a better source of truth, i.e. the markers as the user put arranges and sees them
+        footnotes.detach().sort(function(a, b) {
+            return footnotes.indexOf(this.footnote_ids) ;
+        });
+    }
 } );
