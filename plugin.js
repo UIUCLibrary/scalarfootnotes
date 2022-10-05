@@ -7,6 +7,8 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     icons: 'scalarfootnotes',
 
+    //todo: make it so the footnote marker id and child href can't be changed
+    //todo: make it so the footnote text id and the href of the return to text link can't be changed
     init: function( editor ) {
         // editor.widgets.add( 'scalarfootnotes', {
         //
@@ -109,10 +111,10 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         this.insertNote(footnote, editor)
 
         //go through and renumber the markers
-        this.numberMarkers(editor)
+        this.updateMarkerData(editor)
 
         //go through and update the footnote ids
-        this.updateFootnoteIds(editor)
+        this.updateFootnoteData(editor)
 
         // //rearrange the list items in the footnotes section
         // this.reorderFootnotes()
@@ -124,7 +126,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //todo: lock and unlock snapshot
 
         //go through and renumber the markers
-        this.numberMarkers(editor)
+        this.updateMarkerData(editor)
 
         //go through and update the footnote ids
         this.updateFootnoteIds()
@@ -145,7 +147,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //todo: should this be findOne?
         let footnotes = editor.document.find('div.footnotes')
         if (footnotes.$.length === 0){
-            var container = '<div class="footnotes"><ol></ol></div>';
+            var container = '<div class="footnotes"><ol id="footnote-text"></ol></div>';
             // Move cursor to end of content:
             var range = editor.createRange();
             range.moveToElementEditEnd(range.root);
@@ -153,9 +155,6 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
             // Insert the container:
             editor.insertHtml(container);
         }
-            console.log(editor.document.findOne('div.footnotes > ol'))
-            console.log(footnote)
-
             editor.document.findOne('div.footnotes > ol').append(footnote)
 
 
@@ -181,41 +180,40 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     //updates text and links for markers
     //todo: give this a better name, it doesn't just number them it updates their links
-    numberMarkers: function (editor){
+    updateMarkerData: function (editor){
 
         //generates a static nodeList
         const markers = editor.document.find('sup[data-footnote-relation-id]')
 
         //update the text of the markers and their links
-        console.log('number of markers:')
-        console.log(markers.count())
         for (let i = 0; i < markers.count(); i++){
             const footnote_number = i+1;
             let marker = markers.getItem(i);
-            console.log('marker')
-
-            console.log(marker)
-
             marker.setAttribute('data-footnote-order', footnote_number)
             let footnote_link = marker.getChild(0);
-            console.log('footnote_link')
+            if (footnote_link && footnote_link.hasAttribute('href')){
+                footnote_link.setText(footnote_number.toString())
+            }
+        }
+    },
 
-            console.log(footnote_link)
+    //go through the footnotes and update the id and link to the marker
+    updateFootnoteData: function (editor){
+        //generates a static nodeList
+        const notes = editor.document.find('ol#footnote-text li')
+        console.log(markers)
 
+        //update the text of the markers and their links
+        for (let i = 0; i < notes.count(); i++){
+            const footnote_number = i+1;
+            let note = notes.getItem(i);
+            note.setAttribute('data-footnote-order', footnote_number)
+            let footnote_link = marker.getChild(0);
             if (footnote_link && footnote_link.hasAttribute('href')){
                 footnote_link.setAttribute('href', '#footnote-' + footnote_number.toString())
                 footnote_link.setText(footnote_number.toString())
             }
         }
-
-    },
-
-
-
-
-    //go through the footnotes and update the id and link to the marker
-    updateFootnoteIds: function (editor){
-        const markers = editor.document.find('sup[data-footnote-id]')
     },
 
     reorderFootnotes: function (editor, footnotes){
