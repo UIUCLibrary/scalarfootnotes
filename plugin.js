@@ -134,6 +134,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //generates a static nodeList
         const markers = editor.document.find('sup[data-footnote-id]')
 
+        //update the text of the markers and their links
         for (let i = 0; i < markers.count(); i++){
             const footnote_number = i+1;
             let marker = markers.getItem(i);
@@ -143,21 +144,6 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
                 footnote_link.setText(footnote_number.toString())
             }
         }
-        // markers.forEach(function(currentValue, currentIndex, listObj){
-        //     var footnote_id = listObj.attr('data-footnote-id');
-        //
-        //     // Replace the marker contents:
-        //     let footnote_link =  editor.document.createElement('a', {
-        //         attributes: {
-        //             'id': 'footnote-marker-' + currentIndex.toString(),
-        //             'href': '#footnote-' + currentIndex,
-        //             'rel': 'footnote-' + currentIndex,
-        //         }
-        //     })
-        //
-        //     footnote_link.appendTo(listObj);
-        // });
-
 
     },
 
@@ -172,5 +158,9 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         footnotes.detach().sort(function(a, b) {
             return footnotes.indexOf(this.footnote_ids) ;
         });
+    },
+
+    updateFootnoteIds: function (editor, footnotes){
+
     }
 } );
