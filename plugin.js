@@ -117,7 +117,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         this.updateFootnoteData(editor)
 
         // //rearrange the list items in the footnotes section
-        // this.reorderFootnotes()
+        this.reorderFootnotes(editor)
 
     },
 
@@ -178,8 +178,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     },
 
-    //updates text and links for markers
-    //todo: give this a better name, it doesn't just number them it updates their links
+    //order data and order metadata
     updateMarkerData: function (editor){
 
         //generates a static nodeList
@@ -194,29 +193,33 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
             if (footnote_link && footnote_link.hasAttribute('href')){
                 footnote_link.setText(footnote_number.toString())
             }
+
         }
     },
 
-    //go through the footnotes and update the id and link to the marker
+    //update footnote order metadata
     updateFootnoteData: function (editor){
-        //generates a static nodeList
-        const notes = editor.document.find('ol#footnote-text li')
-        console.log(markers)
+        //get the order of the markers
+        const markers = editor.document.find('sup[data-footnote-relation-id]')
 
-        //update the text of the markers and their links
-        for (let i = 0; i < notes.count(); i++){
-            const footnote_number = i+1;
-            let note = notes.getItem(i);
-            note.setAttribute('data-footnote-order', footnote_number)
-            let footnote_link = marker.getChild(0);
-            if (footnote_link && footnote_link.hasAttribute('href')){
-                footnote_link.setAttribute('href', '#footnote-' + footnote_number.toString())
-                footnote_link.setText(footnote_number.toString())
+        for (let i = 0; i < markers.count(); i++){
+            const marker = markers.getItem(i)
+            const relation_id = marker.getAttribute('data-footnote-relation-id');
+            const order = marker.getAttribute('data-footnote-order')
+            if (relation_id && order) {
+                let note = editor.document.findOne(`li[data-footnote-relation-id="${relation_id}"]`)
+                note.setAttribute('data-footnote-order', order )
             }
         }
+
+
     },
 
-    reorderFootnotes: function (editor, footnotes){
+    reorderFootnotes: function (editor){
+
+        let footnotes = editor.document.find('ol#footnote-text li').toArray()
+        console.log(footnotes)
+        footnotes.sort((a,b) => a.getAttribute('data-footnote-order') - b.getAttribute('data-footnote-order'))
 
 
         // footnotes will be an ordered list of footnotes
@@ -224,8 +227,8 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //spitballing ideas to use the footnotes array as a single source of truth
         //perhaps it would be better to get a query selector of the vdom wih the footnote markers, because
         //that is a better source of truth, i.e. the markers as the user put arranges and sees them
-        footnotes.detach().sort(function(a, b) {
-            return footnotes.indexOf(this.footnote_ids) ;
-        });
+        // footnotes.detach().sort(function(a, b) {
+        //     return footnotes.indexOf(this.footnote_ids) ;
+        // });
     },
 } );
