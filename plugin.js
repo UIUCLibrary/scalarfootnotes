@@ -51,7 +51,10 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         CKEDITOR.dialog.add('scalarfootnotesDialog', this.path + 'dialogs/scalarfootnotes.js');
     },
 
+    //builds a new footnote and reorder all markers and footnotes
     build: function (footnote_text, editor){
+
+        //todo: lock and unlock snapshot
 
         const footnote_id = this.generateId();
         let footnote = editor.document.createElement('li', {
@@ -73,31 +76,55 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
                 'href': '#'
             }
         })
+
+        //give the link some dummy text else it won't be inserted
         footnote_link.appendText('X')
+
+        //add the link to the marker
         footnote_marker.append(footnote_link)
-        // let footnote_marker = '<sup id="' + footnote_id + '" data-footnote-id="' + footnote_id + '">X</sup>';
+
+        //insert the marker at the current focus
         editor.insertElement(footnote_marker);
-        // footnote = '<li>' + footnote + '</li>';
-        // console.log(Object.getOwnPropertyNames(editor))
 
         //insert note in the footnotes section
         this.insertNote(footnote, editor)
+
+        //go through and renumber the markers
         this.numberMarkers(editor)
+
+        //go through and update the footnote ids
+        this.updateFootnoteIds()
+
+        //rearrange the list items in the footnotes section
+        this.reorderFootnotes()
 
     },
 
+    //reorders all footnotes and markers when a marker is moved
+    moreMarker: function (marker, editor){
+        //todo: lock and unlock snapshot
+
+        //go through and renumber the markers
+        this.numberMarkers(editor)
+
+        //go through and update the footnote ids
+        this.updateFootnoteIds()
+
+        //rearrange the list items in the footnotes section
+        this.reorderFootnotes()
+    },
+
+    //helper function placeholder for refactoring
     buildMarker: function (marker_id, editor){},
 
+    //helper function placeholder for refactoring to build the list item
     buildNote: function (footnote_text, footnote_id, editor){},
 
+    //inserts the note into the footnoes section and builds the footnote section if needed
     insertNote: function (footnote, editor){
-        // editor.editable
 
         //todo: should this be findOne?
         let footnotes = editor.document.find('div.footnotes')
-        console.log(footnotes)
-
-        console.log(footnotes.$.length)
         if (footnotes.$.length === 0){
             var container = '<div class="footnotes"><ol></ol></div>';
             // Move cursor to end of content:
@@ -115,6 +142,10 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     },
 
+    //generates the id used for data-footnote-id which links a marker to a note
+    //this facilitates an id for markers and notes that has semantic meaning (1,2.3)
+    //while keeping track of marker<=>note relationships during reordering
+    //todo: evaluate if it would be a better idea to have the semantic information in a data-footnote-id attribute and have the ids/links be a random string
     generateId: function (){
         // this.footnote_max_id += 1;
         // return "sfn-" + this.footnote_max_id.toString();
@@ -129,6 +160,8 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     },
 
+    //updates text and links for markers
+    //todo: give this a better name, it doesn't just number them it updates their links
     numberMarkers: function (editor){
 
         //generates a static nodeList
@@ -147,6 +180,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     },
 
+
     reorderFootnotes: function (editor, footnotes){
 
 
@@ -160,7 +194,9 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         });
     },
 
+    //go through the footnotes and update the id and link to the marker
     updateFootnoteIds: function (editor, footnotes){
+        const markers = editor.document.find('sup[data-footnote-id]')
 
     }
 } );
