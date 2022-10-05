@@ -56,24 +56,43 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
         //todo: lock and unlock snapshot
 
+        //make the footnote list item
         const footnote_id = this.generateId();
         let footnote = editor.document.createElement('li', {
             attributes: {
-                'data-footnote-id':footnote_id
+                'id' : 'footnote-text-' + footnote_id,
+                'data-footnote-relation-id' : footnote_id,
+                'data-footnote-order' : -1
             }
         })
         footnote.appendText(footnote_text)
 
+        //make the link that returns to the marker
+        const footnote_marker_link = editor.document.createElement('a', {
+            attributes : {
+                'href' : 'footnote-marker-' + footnote_id,
+                'class' : 'return-to-marker'
+            }
+        })
+        footnote_marker_link.appendText('↵')
+
+        //add the return to text link to the end of the footnote li
+        footnote.append(footnote_marker_link)
+
+
         //insert the marker
         let footnote_marker =  editor.document.createElement('sup', {
             attributes: {
-                'data-footnote-id':footnote_id
+                'id': 'footnote-marker-' + footnote_id,
+                'data-footnote-relation-id' : footnote_id,
+                'data-footnote-order' : -1
+
             }
         })
 
         let footnote_link = editor.document.createElement('a', {
             attributes: {
-                'href': '#'
+                'href': 'footnote-text-' + footnote_id
             }
         })
 
@@ -93,15 +112,15 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         this.numberMarkers(editor)
 
         //go through and update the footnote ids
-        this.updateFootnoteIds()
+        this.updateFootnoteIds(editor)
 
-        //rearrange the list items in the footnotes section
-        this.reorderFootnotes()
+        // //rearrange the list items in the footnotes section
+        // this.reorderFootnotes()
 
     },
 
     //reorders all footnotes and markers when a marker is moved
-    moreMarker: function (marker, editor){
+    moveMarker: function (marker, editor){
         //todo: lock and unlock snapshot
 
         //go through and renumber the markers
@@ -165,13 +184,24 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
     numberMarkers: function (editor){
 
         //generates a static nodeList
-        const markers = editor.document.find('sup[data-footnote-id]')
+        const markers = editor.document.find('sup[data-footnote-relation-id]')
 
         //update the text of the markers and their links
+        console.log('number of markers:')
+        console.log(markers.count())
         for (let i = 0; i < markers.count(); i++){
             const footnote_number = i+1;
             let marker = markers.getItem(i);
+            console.log('marker')
+
+            console.log(marker)
+
+            marker.setAttribute('data-footnote-order', footnote_number)
             let footnote_link = marker.getChild(0);
+            console.log('footnote_link')
+
+            console.log(footnote_link)
+
             if (footnote_link && footnote_link.hasAttribute('href')){
                 footnote_link.setAttribute('href', '#footnote-' + footnote_number.toString())
                 footnote_link.setText(footnote_number.toString())
@@ -180,6 +210,13 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     },
 
+
+
+
+    //go through the footnotes and update the id and link to the marker
+    updateFootnoteIds: function (editor){
+        const markers = editor.document.find('sup[data-footnote-id]')
+    },
 
     reorderFootnotes: function (editor, footnotes){
 
@@ -193,10 +230,4 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
             return footnotes.indexOf(this.footnote_ids) ;
         });
     },
-
-    //go through the footnotes and update the id and link to the marker
-    updateFootnoteIds: function (editor, footnotes){
-        const markers = editor.document.find('sup[data-footnote-id]')
-
-    }
 } );
