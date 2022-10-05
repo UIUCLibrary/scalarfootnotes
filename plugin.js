@@ -67,7 +67,14 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
                 'data-footnote-id':footnote_id
             }
         })
-        footnote_marker.appendText('X')
+
+        let footnote_link = editor.document.createElement('a', {
+            attributes: {
+                'href': '#'
+            }
+        })
+        footnote_link.appendText('X')
+        footnote_marker.append(footnote_link)
         // let footnote_marker = '<sup id="' + footnote_id + '" data-footnote-id="' + footnote_id + '">X</sup>';
         editor.insertElement(footnote_marker);
         // footnote = '<li>' + footnote + '</li>';
@@ -75,6 +82,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
         //insert note in the footnotes section
         this.insertNote(footnote, editor)
+        this.numberMarkers(editor)
 
     },
 
@@ -126,21 +134,29 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //generates a static nodeList
         const markers = editor.document.find('sup[data-footnote-id]')
 
-        console.log(markers)
-        markers.forEach(function(currentValue, currentIndex, listObj){
-            var footnote_id = listObj.attr('data-footnote-id');
-
-            // Replace the marker contents:
-            let footnote_link =  editor.document.createElement('a', {
-                attributes: {
-                    'id': 'footnote-marker-' + currentIndex.toString(),
-                    'href': '#footnote-' + currentIndex,
-                    'rel': 'footnote-' + currentIndex,
-                }
-            })
-
-            footnote_link.appendTo(listObj);
-        });
+        for (let i = 0; i < markers.count(); i++){
+            const footnote_number = i+1;
+            let marker = markers.getItem(i);
+            let footnote_link = marker.getChild(0);
+            if (footnote_link && footnote_link.hasAttribute('href')){
+                footnote_link.setAttribute('href', '#footnote-' + footnote_number.toString())
+                footnote_link.setText(footnote_number.toString())
+            }
+        }
+        // markers.forEach(function(currentValue, currentIndex, listObj){
+        //     var footnote_id = listObj.attr('data-footnote-id');
+        //
+        //     // Replace the marker contents:
+        //     let footnote_link =  editor.document.createElement('a', {
+        //         attributes: {
+        //             'id': 'footnote-marker-' + currentIndex.toString(),
+        //             'href': '#footnote-' + currentIndex,
+        //             'rel': 'footnote-' + currentIndex,
+        //         }
+        //     })
+        //
+        //     footnote_link.appendTo(listObj);
+        // });
 
 
     },
