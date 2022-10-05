@@ -222,6 +222,9 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         footnotes.sort((a,b) => a.getAttribute('data-footnote-order') - b.getAttribute('data-footnote-order'))
 
 
+        console.log(footnotes)
+        //this does sort them but just as an array, need to do the same but to the dom
+
         // footnotes will be an ordered list of footnotes
 
         //spitballing ideas to use the footnotes array as a single source of truth
