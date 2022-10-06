@@ -33,23 +33,47 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         CKEDITOR.dtd.$editable['cite'] = 1;
         CKEDITOR.dtd.$editable['ol'] = 1;
         CKEDITOR.dtd.$editable['li'] = 1;
+        var $this = this;
+        editor.on('change', function (event){
+            // SetTimeout seems to be necessary (it's used in the core but can't be 100% sure why)
+            setTimeout(function(){
+                    //go through and renumber the markers
+                    $this.updateMarkerData(editor)
+
+                    //go through and update the footnote ids
+                    $this.updateFootnoteData(editor)
+
+                    // //rearrange the list items in the footnotes section
+                    $this.reorderFootnotes(editor)
+                },
+                10
+            );
+        })
+        // editor.on('afterPaste', function (event){
+        //     console.log('the on afterPaste event has been triggered')
+        // })
+        // editor.on('dragStart', function (event){
+        //     console.log('the on dragStart event has been triggered')
+        // })
+        // editor.on('dragEnd', function (event){
+        //     console.log('the on dragEnd event has been triggered')
+        // })
+        // editor.on('paste', function (event){
+        //     console.log('the on paste event has been triggered')
+        // })
+        // Register the scalarfootnotes widget.
+        editor.widgets.add('scalarfootnotes', {
+
+            // Minimum HTML which is required by this widget to work.
+            requiredContent: 'div(footnotes)',
 
 
+            // Check the elements that need to be converted to widgets.
+            upcast: function(element) {
+                return element.name == 'div' && element.hasClass('footnotes');
+            },
 
-
-        // // Register the scalarfootnotes widget.
-        // editor.widgets.add('scalarfootnotes', {
-        //
-        //     // Minimum HTML which is required by this widget to work.
-        //     requiredContent: 'div(footnotes)',
-        //
-        //
-        //     // Check the elements that need to be converted to widgets.
-        //     upcast: function(element) {
-        //         return element.name == 'div' && element.hasClass('footnotes');
-        //     },
-        //
-        // });
+        });
 
         // Register the footnotemarker widget.
         editor.widgets.add('footnotemarker', {
@@ -235,7 +259,17 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
     updateFootnoteData: function (editor){
         //get the order of the markers
         const markers = editor.document.find('sup[data-footnote-relation-id]')
+        const footnotes = editor.document.find('ol#footnote-text li')
 
+        //set order to -1
+        if (footnotes.count()){
+            for (let i = 0; i < footnotes.count(); i++){
+                let fn = footnotes.getItem(i);
+                fn.setAttribute('data-footnote-order','-1');
+            }
+        }
+
+        //apply the correct order from markers
         for (let i = 0; i < markers.count(); i++){
             const marker = markers.getItem(i)
             const relation_id = marker.getAttribute('data-footnote-relation-id');
@@ -252,10 +286,21 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
     reorderFootnotes: function (editor){
 
         let footnotes_list = editor.document.findOne('ol#footnote-text')
-        let footnotes = editor.document.find('ol#footnote-text li').toArray()
+        if(footnotes_list){
+            //get a copy of the footnotes
+            let footnotes = editor.document.find('ol#footnote-text li').toArray()
+            //remove the notes
+            footnotes_list.setHtml('')
 
-        footnotes.sort((a,b) => a.getAttribute('data-footnote-order') - b.getAttribute('data-footnote-order'))
+            //sort the copied footnotes by order id
+            footnotes.sort((a,b) => a.getAttribute('data-footnote-order') - b.getAttribute('data-footnote-order'))
 
-        footnotes.forEach(el => footnotes_list.append(el))
+            for (let i=0; i < footnotes.length; i++){
+                if(footnotes[i].getAttribute('data-footnote-order') > 0 ){
+                    footnotes_list.append(footnotes[i])
+                }
+            }
+        }
+
     },
 } );
