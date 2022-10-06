@@ -30,19 +30,26 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //placeholder css
         var css = '.footnotes{background:#eee; padding:1px 15px;} .footnotes li{font-style: normal;}';
         CKEDITOR.addCss(css);
+        CKEDITOR.dtd.$editable['cite'] = 1;
+        CKEDITOR.dtd.$editable['ol'] = 1;
+        CKEDITOR.dtd.$editable['li'] = 1;
 
-        // Register the scalarfootnotes widget.
-        editor.widgets.add('scalarfootnotes', {
 
-            // Minimum HTML which is required by this widget to work.
-            requiredContent: 'div(footnotes)',
 
-            // Check the elements that need to be converted to widgets.
-            upcast: function(element) {
-                return element.name == 'div' && element.hasClass('footnotes');
-            },
 
-        });
+        // // Register the scalarfootnotes widget.
+        // editor.widgets.add('scalarfootnotes', {
+        //
+        //     // Minimum HTML which is required by this widget to work.
+        //     requiredContent: 'div(footnotes)',
+        //
+        //
+        //     // Check the elements that need to be converted to widgets.
+        //     upcast: function(element) {
+        //         return element.name == 'div' && element.hasClass('footnotes');
+        //     },
+        //
+        // });
 
         // Register the footnotemarker widget.
         editor.widgets.add('footnotemarker', {
@@ -91,7 +98,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
                 'data-footnote-order' : -1
             }
         })
-        footnote.appendText(footnote_text)
+        footnote.appendHtml(footnote_text)
 
         //make the link that returns to the marker
         let footnote_marker_link = editor.document.createElement('a', {
