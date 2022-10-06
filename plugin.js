@@ -38,13 +38,13 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
             // SetTimeout seems to be necessary (it's used in the core but can't be 100% sure why)
             setTimeout(function(){
                 //get the markers
-                let in_sync = true;
                 let markers = editor.document.find('sup[data-footnote-relation-id]').toArray();
                 let notes = editor.document.find('li[data-footnote-relation-id]').toArray();
                 if (markers.length > 0 && notes.length > 0){
+
+                    //compare the order of the markers and notes and rebuild if out of sync
                     let marker_order = markers.map(a => a.getAttribute('data-footnote-relation-id'))
                     let note_order = notes.map(a => a.getAttribute('data-footnote-relation-id'))
-
                     if (marker_order !== note_order){
                         console.log('not in sync')
                         //go through and renumber the markers
