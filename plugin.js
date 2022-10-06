@@ -37,14 +37,26 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         editor.on('change', function (event){
             // SetTimeout seems to be necessary (it's used in the core but can't be 100% sure why)
             setTimeout(function(){
-                    //go through and renumber the markers
-                    $this.updateMarkerData(editor)
+                //get the markers
+                let in_sync = true;
+                let markers = editor.document.find('sup[data-footnote-relation-id]').toArray();
+                let notes = editor.document.find('li[data-footnote-relation-id]').toArray();
+                if (markers.length > 0 && notes.length > 0){
+                    let marker_order = markers.map(a => a.getAttribute('data-footnote-relation-id'))
+                    let note_order = notes.map(a => a.getAttribute('data-footnote-relation-id'))
 
-                    //go through and update the footnote ids
-                    $this.updateFootnoteData(editor)
+                    if (marker_order !== note_order){
+                        console.log('not in sync')
+                        //go through and renumber the markers
+                        $this.updateMarkerData(editor)
 
-                    // //rearrange the list items in the footnotes section
-                    $this.reorderFootnotes(editor)
+                        //go through and update the footnote ids
+                        $this.updateFootnoteData(editor)
+
+                        // //rearrange the list items in the footnotes section
+                        $this.reorderFootnotes(editor)
+                    }
+                }
                 },
                 10
             );
@@ -279,8 +291,6 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
                 note.setAttribute('data-footnote-order', order )
             }
         }
-
-
     },
 
     reorderFootnotes: function (editor){
