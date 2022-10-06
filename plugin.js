@@ -7,33 +7,56 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
     icons: 'scalarfootnotes',
 
+    //configurations
     //todo: make it so the footnote marker id and child href can't be changed
     //todo: make it so the footnote text id and the href of the return to text link can't be changed
+    //todo: maybe not possible, but make it so the ol is not editable butt the li are editable to prevent accidental additions of list items
+
+    //features
+    //todo: move the marker
+
+    //events
+    //todo: on delete marker, delete note
+    //todo: on delete note, delete marker
+    //todo: on moving a marker, update marker data, update footnote data, rearrange footnotes
+
+    //edge cases
+    //todo: do nothing if marker is dragged into the footnote area
+    //todo: footnote with no body
+    //todo: footnote as first character
+    //todo: footnote as last character
     init: function( editor ) {
-        // editor.widgets.add( 'scalarfootnotes', {
-        //
-        //     editables: {
-        //         title: {
-        //             selector: '.simplebox-title',
-        //             allowedContent: 'br strong em'
-        //         },
-        //         content: {
-        //             selector: '.simplebox-content',
-        //             allowedContent: 'p br ul ol li strong em'
-        //         }
-        //     },
-        //
-        //     allowedContent:
-        //         'div(!simplebox); div(!simplebox-content); h2(!simplebox-title)',
-        //
-        //     requiredContent: 'div(simplebox)',
-        //
-        //
-        //     upcast: function( element ) {
-        //         return element.name == 'div' && element.hasClass( 'simplebox' );
-        //     },
-        //
-        // } );
+
+        //placeholder css
+        var css = '.footnotes{background:#eee; padding:1px 15px;} .footnotes li{font-style: normal;}';
+        CKEDITOR.addCss(css);
+
+        // Register the scalarfootnotes widget.
+        editor.widgets.add('scalarfootnotes', {
+
+            // Minimum HTML which is required by this widget to work.
+            requiredContent: 'div(footnotes)',
+
+            // Check the elements that need to be converted to widgets.
+            upcast: function(element) {
+                return element.name == 'div' && element.hasClass('footnotes');
+            },
+
+        });
+
+        // Register the footnotemarker widget.
+        editor.widgets.add('footnotemarker', {
+
+            // Minimum HTML which is required by this widget to work.
+            requiredContent: 'sup[data-footnote-relation-id]',
+
+            // Check the elements that need to be converted to widgets.
+            upcast: function(element) {
+                return element.name == 'sup' && element.attributes['data-footnote-relation-id'] != 'undefined';
+            },
+        });
+
+
         editor.ui.addButton('scalarfootnotes', {
 
             // The text part of the button (if available) and tooptip.
@@ -59,9 +82,10 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //todo: lock and unlock snapshot
 
         //make the footnote list item
-        const footnote_id = this.generateId();
+        let footnote_id = this.generateId();
         let footnote = editor.document.createElement('li', {
             attributes: {
+                'class' : 'footnote-text',
                 'id' : 'footnote-text-' + footnote_id,
                 'data-footnote-relation-id' : footnote_id,
                 'data-footnote-order' : -1
@@ -70,7 +94,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         footnote.appendText(footnote_text)
 
         //make the link that returns to the marker
-        const footnote_marker_link = editor.document.createElement('a', {
+        let footnote_marker_link = editor.document.createElement('a', {
             attributes : {
                 'href' : 'footnote-marker-' + footnote_id,
                 'class' : 'return-to-marker'
@@ -85,6 +109,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //insert the marker
         let footnote_marker =  editor.document.createElement('sup', {
             attributes: {
+                'class' : 'footnote-marker',
                 'id': 'footnote-marker-' + footnote_id,
                 'data-footnote-relation-id' : footnote_id,
                 'data-footnote-order' : -1
@@ -104,8 +129,9 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
         //add the link to the marker
         footnote_marker.append(footnote_link)
 
-        //insert the marker at the current focus
-        editor.insertElement(footnote_marker);
+        //insert the marker at the current focus. Don't understand why, but must be inserted as html not object
+        //or it won't become a widget
+        editor.insertHtml(footnote_marker.getOuterHtml());
 
         //insert note in the footnotes section
         this.insertNote(footnote, editor)
@@ -118,6 +144,7 @@ CKEDITOR.plugins.add( 'scalarfootnotes', {
 
         // //rearrange the list items in the footnotes section
         this.reorderFootnotes(editor)
+
 
     },
 
