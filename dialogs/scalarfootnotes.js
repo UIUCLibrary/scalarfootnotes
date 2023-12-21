@@ -65,9 +65,9 @@
                         { name: 'clipboard', items : ['Undo','Redo' ] },
                         { name: 'basicstyles', items : [ 'Bold','Italic','Underline','TextColor', 'BGColor' ] },
                         { name: 'clear', items : [ 'RemoveFormat','Link','Unlink' ] },
-
+                        { name: 'formatting', items : [ 'Blockquote','-','SpecialChar','Code','Iframe' ] },
                     ]
-                    config.allowedContent = 'br em strong; a[!href]';
+                    config.allowedContent = 'blockquote p span br em strong div[*](*){*}; a[!href]';
                     config.enterMode = CKEDITOR.ENTER_BR;
                     config.autoParagraph = false;
                     config.height = 80;

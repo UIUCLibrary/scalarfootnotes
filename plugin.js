@@ -40,10 +40,10 @@
                 return;
             }
             // Allow `cite` to be editable:
-            CKEDITOR.dtd.$editable['cite'] = 1;
+            CKEDITOR.dtd.$editable['div'] = 1;
 
             // Add some CSS tweaks:
-            var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes cite{font-style: normal;}';
+            var css = '.scalarfootnotes{background:#eee; padding:1px 15px;} .scalarfootnotes div.cite{font-style: normal;}';
             CKEDITOR.addCss(css);
 
             let $this = this;
@@ -81,14 +81,14 @@
                 header: {
                     selector: 'header > *',
                     //allowedContent: ''
-                    allowedContent: 'span[*](*);strong em span sub sup;'
+                    allowedContent: 'a span br p blockquote div[*](*); strong em sub sup;'
                 }
             };
             var contents = $('<div>' + editor.element.$.textContent + '</div>')
                 , l = contents.find('.scalarfootnotes li').length
                 , i = 1;
             for (i; i <= l; i++) {
-                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; span[*](*); cite[*](*); strong em span br'};
+                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' div.cite', allowedContent: 'a span br p blockquote div[*](*); strong sub sup'};
             }
 
             // Register the scalarfootnotes widget.
@@ -120,7 +120,7 @@
             // Define an editor command that opens our dialog.
             editor.addCommand('scalarfootnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
                 // @TODO: This needs work:
-                allowedContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*];span[*](*)',
+                allowedContent: 'div[*](*);header[*](*);li[*](*);a[*](*);cite(*)[*];sup[*](*);span[*](*);p[*](*);blockquote[*](*);br[*](*)',
                 requiredContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]'
             }));
 
@@ -177,7 +177,7 @@
                     }
                 }
             }
-            footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '"><cite>' + footnote_text + '</cite>' + links + '</li>';
+            footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '"><div class="cite">' + footnote_text + '</div>' + links + '</li>';
             return footnote;
         },
 
@@ -273,7 +273,7 @@
                 , l = data.order.length;
             for (i; i < l; i++) {
                 footnote_id   = data.order[i];
-                footnote_text = $contents.find('.scalarfootnotes [data-footnote-id=' + footnote_id + '] cite').html();
+                footnote_text = $contents.find('.scalarfootnotes [data-footnote-id=' + footnote_id + '] div.cite').html();
                 // If the scalarfootnotes text can't be found in the editor, it may be in the tmp store
                 // following a cut:
                 if (!footnote_text) {
@@ -303,7 +303,7 @@
             // Then we `initEditable` each footnote, giving it a unique selector:
             for (i in data.order) {
                 n = parseInt(i) + 1;
-                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[href]; span[*](*); cite[*](*); em strong span'});
+                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' div.cite', allowedContent: 'a span br p blockquote div[*](*); strong sub sup'});
             }
 
             editor.fire('unlockSnapshot');
