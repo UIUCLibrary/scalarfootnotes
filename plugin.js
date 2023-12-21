@@ -81,14 +81,14 @@
                 header: {
                     selector: 'header > *',
                     //allowedContent: ''
-                    allowedContent: 'span[*](*);strong em span sub sup;'
+                    allowedContent: 'span[*](*);strong em span sub sup br(*);'
                 }
             };
             var contents = $('<div>' + editor.element.$.textContent + '</div>')
                 , l = contents.find('.scalarfootnotes li').length
                 , i = 1;
             for (i; i <= l; i++) {
-                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; span[*](*); cite[*](*); strong em span br'};
+                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; span[*](*); cite[*](*); strong em span br(*)'};
             }
 
             // Register the scalarfootnotes widget.
@@ -120,7 +120,7 @@
             // Define an editor command that opens our dialog.
             editor.addCommand('scalarfootnotes', new CKEDITOR.dialogCommand('scalarfootnotesDialog', {
                 // @TODO: This needs work:
-                allowedContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*];span[*](*)',
+                allowedContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*];span[*](*);br[*](*)',
                 requiredContent: 'div[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]'
             }));
 
@@ -303,7 +303,7 @@
             // Then we `initEditable` each footnote, giving it a unique selector:
             for (i in data.order) {
                 n = parseInt(i) + 1;
-                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[href]; span[*](*); cite[*](*); em strong span'});
+                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[href]; span[*](*); cite[*](*); em strong span br(*)'});
             }
 
             editor.fire('unlockSnapshot');
